@@ -15,11 +15,9 @@ class ListMemberScreen extends StatefulWidget {
 class _ListMemberScreenState extends State<ListMemberScreen> {
   @override
   Widget build(BuildContext context) {
-    final dataWatch =
-        ref.watch(teamStateProvider.select((value) => value.dataLocal));
     int idex = 0;
     List<Widget> chooseMember(String type) {
-      return dataWatch[type]?.map(
+      return dataTeam[type]?.map(
             (e) {
               idex++;
               return Container(
@@ -30,10 +28,13 @@ class _ListMemberScreenState extends State<ListMemberScreen> {
                   trailing: Checkbox(
                     value: e['isPlay'],
                     onChanged: (value) {
-                      teamNotifier.changeStatusPlay(idex, type);
+                      setState(() {
+                        e['isPlay'] = value;
+                      });
+                      // teamNotifier.changeStatusPlay(idex, type);
                       // add player by addPlayer function in teamstate_provider.dart
-                      teamNotifier.addPlayer(Player(
-                          name: e['name'], stat: e['stat'], isPlay: value));
+                      // teamNotifier.addPlayer(Player(
+                      //     name: e['name'], stat: e['stat'], isPlay: value));
                     },
                   ),
                 ),
@@ -45,7 +46,7 @@ class _ListMemberScreenState extends State<ListMemberScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sach cau thu'),
+        title: Text('Danh sách cầu thủ'),
       ),
       body: ListView(
         children: [
@@ -107,11 +108,45 @@ class _ListMemberScreenState extends State<ListMemberScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          teamNotifier.randomTeam(2);
+          List<Map<String, dynamic>> poolHauve = [];
+          List<Map<String, dynamic>> poolThumon = [];
+          List<Map<String, dynamic>> poolTiendao = [];
+          List<Map<String, dynamic>> poolTienve = [];
+          dataTeam['hauve']?.forEach((element) {
+            if (element['isPlay']) {
+              poolHauve.add(element);
+            }
+          });
+          dataTeam['tiendao']?.forEach((element) {
+            if (element['isPlay']) {
+              poolTiendao.add(element);
+            }
+          });
+          dataTeam['tienve']?.forEach((element) {
+            if (element['isPlay']) {
+              poolTienve.add(element);
+            }
+          });
+          dataTeam['thumon']?.forEach((element) {
+            if (element['isPlay']) {
+              poolThumon.add(element);
+            }
+          });
+          final paramSend = {
+            'hauve': poolHauve,
+            'thumon': poolThumon,
+            'tiendao': poolTiendao,
+            'tienve': poolTienve,
+          };
+          Navigator.pushNamed(context, '/result', arguments: paramSend);
         },
         child: Container(
+          alignment: Alignment.center,
           width: 200,
-          child: Text('Chia đội'),
+          child: Text(
+            'Chia đội',
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
